@@ -1,0 +1,36 @@
+classDiagram
+    class Owner {
+        +String name
+        +String email
+        +List~Pet~ pets
+        +add_pet(pet: Pet)
+        +get_all_plans() String
+    }
+
+    class Pet {
+        +String name
+        +String breed
+        +int age
+        +int available_time
+        +get_profile_summary() String
+    }
+
+    class Task {
+        +String name
+        +int duration
+        +String priority
+        +bool is_scheduled
+        +to_dict() dict
+    }
+
+    class Scheduler {
+        +List~Task~ tasks
+        +int allocated_time
+        +add_task(task: Task)
+        +generate_plan(max_time: int) List~Task~
+        +get_reasoning_summary() String
+    }
+
+    Owner "1" --> "0..*" Pet : owns
+    Pet "1" --> "1" Scheduler : has a
+    Scheduler "1" --> "0..*" Task : schedules
