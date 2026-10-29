@@ -7,15 +7,12 @@ st.set_page_config(page_title="PawPal+ Care Planner", page_icon="🐾", layout="
 st.title("🐾 PawPal+ Care Task Planner")
 st.subheader("Plan smart, personalized daily schedules across all your pets.")
 
-# Check if an 'owner' already exists in the session state dictionary
+# Initialize global state variables for our system objects
 if "owner" not in st.session_state:
-    # If it's missing, create it once and store it safely in the vault
-    st.session_state.owner = Owner(name="Pet Parent", email="parent@parent.com")
-
+    st.session_state.owner = Owner(name="Pet Parent", email="parent@example.com")
 if "scheduler" not in st.session_state:
     st.session_state.scheduler = Scheduler()
 
-# Pull the objects out of the vault so the rest of the app can use them
 owner = st.session_state.owner
 scheduler = st.session_state.scheduler
 
@@ -25,7 +22,7 @@ col1, col2 = st.columns(2)
 with col1:
     st.header("🗂️ Profiles & Management")
     
-    # Section A: Profile Setup
+    # Section A: Profile Setup Form
     with st.expander("➕ Add New Pet Profile", expanded=len(owner.pets) == 0):
         with st.form("pet_form", clear_on_submit=True):
             p_name = st.text_input("Pet Name", placeholder="Biscuit")
@@ -37,10 +34,9 @@ with col1:
                 new_pet = Pet(name=p_name, breed=p_breed, age=p_age)
                 owner.add_pet(new_pet)
                 st.success(f"Added profile for {p_name}!")
-                st.hierarchy = True
                 st.rerun()
 
-    # Section B: Task Creator
+    # Section B: Task Creator Form
     if owner.pets:
         with st.expander("📋 Add Care Task", expanded=True):
             with st.form("task_form", clear_on_submit=True):
@@ -52,14 +48,14 @@ with col1:
                 submit_task = st.form_submit_button("Add Task")
                 
                 if submit_task and t_desc:
-                    # Find the selected target pet object matching the name
+                    # Find the selected target pet object matching the name string
                     target_pet = next(p for p in owner.pets if p.name == target_pet_name)
                     new_task = Task(description=t_desc, time=t_time, frequency=t_freq, priority=t_priority)
                     target_pet.add_task(new_task)
                     st.success(f"Added '{t_desc}' task to {target_pet_name}!")
                     st.rerun()
                     
-        # Visual Summary Metrics
+        # Active Roster Display
         st.write("### Active Pet Rosters:")
         for pet in owner.pets:
             st.info(f"**{pet.name}** ({pet.breed}) — Tracking **{len(pet.tasks)}** total care activities.")
@@ -74,7 +70,7 @@ with col2:
         time_budget = st.slider("Total Available Time Budget Today (Minutes)", min_value=15, max_value=480, value=90, step=15)
         
         if st.button("🚀 Generate Optimized Care Schedule", type="primary"):
-            # Execute logic pipeline
+            # Execute engine calculation logic pipeline
             daily_plan = scheduler.generate_daily_plan(owner, available_time_budget=time_budget)
             
             st.write("### 📅 Your Optimized Daily Schedule")
