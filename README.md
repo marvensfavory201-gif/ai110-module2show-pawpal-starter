@@ -79,21 +79,36 @@ Daily Schedule Reasoning:
 
 ## 🧪 Testing PawPal+
 
+To verify that the calendar rules, timeline ordering, and warning pipelines function correctly without structural failure, run the automated test suite with the following terminal command:
+
 ```bash
 # Run the full test suite:
-pytest
+python -m pytest
 
 # Run with coverage:
-pytest --cov
+- **`test_sorting_correctness`:** Assures that out-of-order task lists are successfully organized chronologically by their `"HH:MM"` text stamps.
+- **`test_recurrence_logic`:** Confirms that checking off daily items automatically updates calendars for the following day using `timedelta` adjustments.
+- **`test_conflict_detection`:** Verifies that overlapping task milestones generate explicit safety alerts without crashing execution modules.
+
 ```
 
 Sample test output:
+============================= test session starts =============================
+platform win32 -- Python 3.11.5, pytest-7.4.0, pluggy-1.2.0
+rootdir: C:\Users\Student\Projects\ai110-module2show-pawpal-starter
+collected 3 items
 
+tests/test_pawpal.py ...                                                 [100%]
+
+============================== 3 passed in 0.08s ==============================
+```
 ```
 # Paste your pytest output here
 ```
+⭐ ⭐ ⭐ ⭐ ⭐ (5/5 Stars)  
+The suite aggressively isolates individual behavior methods, confirming that date transitions, calendar sort structures, and time-block overlap constraints operate correctly under both optimal and conflicting real-world scenarios.
 
-## 📐 Smarter Scheduling
+##   📐 Smarter Scheduling
 
 > Fill in once you've implemented scheduling logic.
 
