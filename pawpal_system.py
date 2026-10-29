@@ -9,6 +9,10 @@ class Task:
     is_completed: bool = False
     priority: str = "Medium"  # "High", "Medium", "Low"
 
+    def mark_complete(self) -> None:
+        """Changes the task completion status to True."""
+        self.is_completed = True
+
     def to_dict(self) -> Dict:
         """Converts the task attributes into a dictionary for UI rendering."""
         return {
@@ -88,7 +92,7 @@ class Scheduler:
         for item in sorted_tasks:
             task_obj = item["task_obj"]
             if item["time"] <= remaining_time:
-                task_obj.is_completed = True  # Mark as scheduled/completed for the day
+                task_obj.mark_complete()  # Mark as scheduled/completed for the day
                 remaining_time -= item["time"]
                 self.allocated_time += item["time"]
                 
