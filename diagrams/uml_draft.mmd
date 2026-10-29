@@ -4,33 +4,41 @@ classDiagram
         +String email
         +List~Pet~ pets
         +add_pet(pet: Pet)
-        +get_all_plans() String
+        +get_all_tasks_across_pets() List~Dict~
     }
 
     class Pet {
         +String name
         +String breed
         +int age
-        +int available_time
-        +get_profile_summary() String
+        +List~Task~ tasks
+        +add_task(task: Task)
     }
 
     class Task {
-        +String name
-        +int duration
+        +String description
+        +int time
+        +String frequency
+        +String start_time
+        +bool is_completed
         +String priority
-        +bool is_scheduled
-        +to_dict() dict
+        +date due_date
+        +mark_complete(pet: Pet)
+        +to_dict() Dict
     }
 
     class Scheduler {
-        +List~Task~ tasks
         +int allocated_time
-        +add_task(task: Task)
-        +generate_plan(max_time: int) List~Task~
+        +List~String~ reasoning_log
+        +List~String~ conflicts
+        +sort_by_time(tasks: List) List
+        +filter_tasks(tasks: List, exclude_completed: bool, pet_name: str) List
+        +detect_conflicts(scheduled_plan: List)
+        +generate_daily_plan(owner: Owner, available_time_budget: int) List~Dict~
         +get_reasoning_summary() String
     }
 
-    Owner "1" --> "0..*" Pet : owns
-    Pet "1" --> "1" Scheduler : has a
-    Scheduler "1" --> "0..*" Task : schedules
+    Owner "1" --> "0..*" Pet : manages
+    Pet "1" --> "0..*" Task : aggregates
+    Scheduler ..> Owner : requests data from
+    Scheduler ..> Task : mutates state via mark_complete
