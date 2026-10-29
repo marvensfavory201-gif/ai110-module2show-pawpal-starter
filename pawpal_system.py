@@ -6,6 +6,7 @@ class Task:
     description: str
     time: int  # Duration in minutes
     frequency: str  # e.g., "Daily", "Weekly"
+    start_time: str = "08:00"  # Format: "HH:MM" (e.g., "09:30", "14:00")
     is_completed: bool = False
     priority: str = "Medium"  # "High", "Medium", "Low"
 
@@ -19,6 +20,7 @@ class Task:
             "description": self.description,
             "time": self.time,
             "frequency": self.frequency,
+            "start_time": self.start_time,
             "is_completed": self.is_completed,
             "priority": self.priority
         }
@@ -47,16 +49,13 @@ class Owner:
         self.pets.append(pet)
 
     def get_all_tasks_across_pets(self) -> List[Dict]:
-        """
-        Retrieves a flat list of all tasks across all pets.
-        Includes a back-reference to which pet owns each task.
-        """
+        """Retrieves a flat list of all tasks across all pets with back-references."""
         all_tasks = []
         for pet in self.pets:
             for task in pet.tasks:
                 task_data = task.to_dict()
-                task_data["pet_name"] = pet.name  # Link task to the pet context
-                task_data["task_obj"] = task       # Keep object reference for scheduling updates
+                task_data["pet_name"] = pet.name
+                task_data["task_obj"] = task
                 all_tasks.append(task_data)
         return all_tasks
 
@@ -66,50 +65,55 @@ class Scheduler:
         self.allocated_time: int = 0
         self.reasoning_log: List[str] = []
 
+    def sort_by_time(self, tasks: List[Dict]) -> List[Dict]:
+        """Sorts a list of task dictionaries chronologically by their HH:MM start time string."""
+        return sorted(tasks, key=lambda t: t["start_time"])
+
+    def filter_tasks(self, tasks: List[Dict], exclude_completed: bool = False, pet_name: str = None) -> List[Dict]:
+        """Filters tasks by completion status or specific pet name attributes."""
+        filtered = tasks
+        if exclude_completed:
+            filtered = [t for t in filtered if not t["is_completed"]]
+        if pet_name:
+            filtered = [t for t in filtered if t["pet_name"].lower() == pet_name.lower()]
+        return filtered
+
     def generate_daily_plan(self, owner: Owner, available_time_budget: int) -> List[Dict]:
-        """
-        The 'Brain' of the system.
-        Retrieves all tasks from the Owner's pets, sorts them by priority level,
-        and packs them into the day's time budget.
-        """
-        priority_weights = {"High": 3, "Medium": 2, "Low": 1}
+        """Retrieves, sorts chronologically, filters out completed tasks, and fits into budget."""
         self.allocated_time = 0
         self.reasoning_log = []
         
-        # 1. Retrieve all tasks across pets using the Owner's access method
+        # 1. Fetch raw list
         raw_tasks = owner.get_all_tasks_across_pets()
         
-        # 2. Organize: Sort by priority weight (highest first), then by duration (shorter first)
-        sorted_tasks = sorted(
-            raw_tasks,
-            key=lambda t: (-priority_weights.get(t["priority"], 2), t["time"])
-        )
+        # 2. Filter out already completed tasks so they don't block fresh time budgets
+        active_tasks = self.filter_tasks(raw_tasks, exclude_completed=True)
+        
+        # 3. Sort Chronologically by string time using our updated method
+        sorted_tasks = self.sort_by_time(active_tasks)
         
         scheduled_plan = []
         remaining_time = available_time_budget
         
-        # 3. Schedule within constraints
+        # 4. Fit into time constraint
         for item in sorted_tasks:
             task_obj = item["task_obj"]
             if item["time"] <= remaining_time:
-                task_obj.mark_complete()  # Mark as scheduled/completed for the day
                 remaining_time -= item["time"]
                 self.allocated_time += item["time"]
-                
-                # Add to final plan view
                 scheduled_plan.append({
                     "pet_name": item["pet_name"],
                     "description": item["description"],
                     "time": item["time"],
+                    "start_time": item["start_time"],
                     "priority": item["priority"]
                 })
                 self.reasoning_log.append(
-                    f"Scheduled '{item['description']}' for {item['pet_name']} ({item['time']} min) [Priority: {item['priority']}]"
+                    f"Scheduled '{item['description']}' at {item['start_time']} ({item['time']} min)"
                 )
             else:
-                task_obj.is_completed = False
                 self.reasoning_log.append(
-                    f"Skipped '{item['description']}' for {item['pet_name']} ({item['time']} min) — Exceeds remaining budget of {remaining_time} min."
+                    f"Skipped '{item['description']}' at {item['start_time']} — Exceeds remaining budget."
                 )
                 
         return scheduled_plan

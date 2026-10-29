@@ -99,10 +99,11 @@ Sample test output:
 
 | Feature | Method(s) | Notes |
 |---------|-----------|-------|
-| Task sorting | | e.g., by priority, duration |
-| Filtering | | e.g., skip tasks if time runs out |
-| Conflict handling | | e.g., overlapping time slots |
-| Recurring tasks | | e.g., daily vs. weekly |
+| Task sorting | `generate_daily_plan` | Sorted by priority weight first, then by duration efficiency fallback. |
+| Filtering | `get_all_tasks_across_pets` | Drops tasks belonging to inactive pets or items already marked complete. |
+| Conflict handling | `detect_schedule_conflicts` | Flags tasks scheduled for the same pet at overlapping preferred hour slots. |
+| Recurring tasks | `filter_by_cadence` | Skips non-daily items unless explicitly requested for today's plan. |
+
 
 ## 📸 Demo Walkthrough
 

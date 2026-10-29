@@ -1,53 +1,34 @@
 from pawpal_system import Owner, Pet, Task, Scheduler
 
 def main():
-    # 1. Create an Owner
     owner = Owner(name="Alex", email="alex@example.com")
-
-    # 2. Create at least two Pets
     biscuit = Pet(name="Biscuit", breed="Golden Retriever", age=3)
     cleo = Pet(name="Cleo", breed="Siamese Cat", age=5)
-
     owner.add_pet(biscuit)
     owner.add_pet(cleo)
 
-    # 3. Add at least three Tasks with different times and priorities
-    # High Priority task (Should schedule first)
-    biscuit.add_task(Task(description="Morning Insulin Medication", time=10, frequency="Daily", priority="High"))
-    
-    # Medium Priority task
-    biscuit.add_task(Task(description="Long Park Walk", time=45, frequency="Daily", priority="Medium"))
-    
-    # Low Priority task (May get skipped if time runs out)
-    cleo.add_task(Task(description="Full Grooming & Brushing", time=30, frequency="Weekly", priority="Low"))
-    
-    # Another High Priority task
-    cleo.add_task(Task(description="Morning Feeding", time=15, frequency="Daily", priority="High"))
+    # 1. Add tasks explicitly OUT OF ORDER chronologically
+    biscuit.add_task(Task(description="Night Walk", time=20, frequency="Daily", start_time="20:00"))
+    biscuit.add_task(Task(description="Morning Meds", time=10, frequency="Daily", start_time="07:30"))
+    cleo.add_task(Task(description="Afternoon Grooming", time=30, frequency="Weekly", start_time="14:15"))
+    cleo.add_task(Task(description="Midday Feeding", time=15, frequency="Daily", start_time="12:00"))
 
-    # 4. Instantiate the Scheduler and run with a 75-minute total time budget
     scheduler = Scheduler()
-    time_budget = 75
-    
-    plan = scheduler.generate_daily_plan(owner, available_time_budget=time_budget)
+    all_tasks = owner.get_all_tasks_across_pets()
 
-    # 5. Clear, readable output formatting for the terminal
     print("=" * 60)
-    print(f"📅 TODAY'S GENERATED CARE SCHEDULE (Budget: {time_budget} mins)")
+    print("🔍 VERIFYING CHRONOLOGICAL HH:MM SORTING METHOD")
     print("=" * 60)
-    
-    if not plan:
-        print("No tasks could be scheduled today.")
-    else:
-        for item in plan:
-            print(f"🐾 [{item['pet_name']}] {item['description']}")
-            print(f"   ⏱️  Duration: {item['time']} mins | ⭐ Priority: {item['priority']}")
-            print("-" * 60)
-            
+    sorted_res = scheduler.sort_by_time(all_tasks)
+    for t in sorted_res:
+        print(f"⏰ [{t['start_time']}] - {t['pet_name']}: {t['description']}")
+
     print("\n" + "=" * 60)
-    print("🧠 SCHEDULER LOGS & DECISION REASONING")
+    print("🔍 VERIFYING SPECIFIC PET FILTER METHOD (Cleo Only)")
     print("=" * 60)
-    print(scheduler.get_reasoning_summary())
-    print("=" * 60)
+    cleo_only = scheduler.filter_tasks(all_tasks, pet_name="Cleo")
+    for t in cleo_only:
+        print(f"🐱 Filtered Item -> {t['pet_name']}: {t['description']}")
 
 if __name__ == "__main__":
     main()
