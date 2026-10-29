@@ -13,7 +13,12 @@ class Task:
     due_date: date = field(default_factory=date.today)
 
     def mark_complete(self, pet=None) -> None:
-        """Marks the task complete and creates the next instance if recurring."""
+        """
+        Marks the task complete and creates the next instance if recurring.
+        
+        Args:
+            pet: The Pet object instance to append the next occurrence to.
+        """
         if self.is_completed:
             return
             
@@ -89,11 +94,27 @@ class Scheduler:
         self.conflicts: List[str] = []
 
     def sort_by_time(self, tasks: List[Dict]) -> List[Dict]:
-        """Sorts a list of task dictionaries chronologically by start time string."""
+        """
+        Sorts a list of task dictionaries chronologically by start time string.
+        
+        Args:
+            tasks: A list of task data dictionaries containing 'start_time'.
+        Returns:
+            A chronologically sorted list of task dictionaries.
+        """
         return sorted(tasks, key=lambda t: t["start_time"])
 
     def filter_tasks(self, tasks: List[Dict], exclude_completed: bool = False, pet_name: str = None) -> List[Dict]:
-        """Filters tasks by completion status or specific pet name attributes."""
+        """
+        Filters tasks by completion status or specific pet name attributes.
+        
+        Args:
+            tasks: A list of task dictionaries to filter.
+            exclude_completed: If True, filters out finished tasks.
+            pet_name: Optional string to match against a single pet.
+        Returns:
+            A filtered sub-list of task dictionaries.
+        """
         filtered = tasks
         if exclude_completed:
             filtered = [t for t in filtered if not t["is_completed"]]
@@ -102,9 +123,14 @@ class Scheduler:
         return filtered
 
     def detect_conflicts(self, scheduled_plan: List[Dict]) -> None:
-        """Scans the scheduled plan and lists lightweight warning messages for overlapping start times."""
+        """
+        Scans the scheduled plan and logs warnings for overlapping start times.
+        
+        Args:
+            scheduled_plan: A list of already scheduled task dictionaries.
+        """
         self.conflicts = []
-        seen_times = {}  # Tracks start_time -> list of tasks scheduled at that time
+        seen_times = {}
         
         for item in scheduled_plan:
             t_time = item["start_time"]
@@ -119,7 +145,15 @@ class Scheduler:
                 self.conflicts.append(warning_msg)
 
     def generate_daily_plan(self, owner: Owner, available_time_budget: int) -> List[Dict]:
-        """Generates an ordered dynamic plan, automating recurrences and verifying timeline overlaps."""
+        """
+        Generates an ordered daily schedule plan while tracking budgets and conflicts.
+        
+        Args:
+            owner: The Owner instance whose pet tasks are evaluated.
+            available_time_budget: Total minutes available for tasks.
+        Returns:
+            A list of successfully scheduled task dictionaries.
+        """
         self.allocated_time = 0
         self.reasoning_log = []
         
@@ -151,7 +185,6 @@ class Scheduler:
             else:
                 self.reasoning_log.append(f"Skipped '{item['description']}' — Exceeds remaining budget.")
                 
-        # Run our conflict verification on the completed schedule layout
         self.detect_conflicts(scheduled_plan)
         return scheduled_plan
 

@@ -99,10 +99,10 @@ Sample test output:
 
 | Feature | Method(s) | Notes |
 |---------|-----------|-------|
-| Task sorting | `generate_daily_plan` | Sorted by priority weight first, then by duration efficiency fallback. |
-| Filtering | `get_all_tasks_across_pets` | Drops tasks belonging to inactive pets or items already marked complete. |
-| Conflict handling | `detect_schedule_conflicts` | Flags tasks scheduled for the same pet at overlapping preferred hour slots. |
-| Recurring tasks | `filter_by_cadence` | Skips non-daily items unless explicitly requested for today's plan. |
+| Task sorting | `Scheduler.sort_by_time()` | Organizes all active, pending care activities chronologically using string `"HH:MM"` sorting. |
+| Filtering | `Scheduler.filter_tasks()` | Allows isolation of workflows by pet name parameters and automatically filters out pre-completed tasks. |
+| Conflict handling | `Scheduler.detect_conflicts()` | Scans scheduled blocks and logs safe, non-crashing warnings if tasks share an identical starting slot. |
+| Recurring tasks | `Task.mark_complete()` | Employs Python `timedelta` offsets to auto-schedule the next occurrence date for continuous daily/weekly patterns. |
 
 
 ## 📸 Demo Walkthrough

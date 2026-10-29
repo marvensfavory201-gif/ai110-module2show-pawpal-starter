@@ -82,6 +82,7 @@ I am very satisfied with how cleanly the backend algorithm works together with t
 **b. What you would improve**
 
 - If you had another iteration, what would you improve or redesign?
+
 In a second iteration, I would add a feature to let users delete or check off tasks manually from the UI view instead of regenerating the entire list every time.
 
 **c. Key takeaway**
