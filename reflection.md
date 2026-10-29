@@ -12,8 +12,8 @@
 
 **b. Design changes**
 
-- Did your design change during implementation?
-- If yes, describe at least one change and why you made it.
+- **Change made:** I updated the `Scheduler` class to  link with a `Pet` instance, and introduced an internal priority-weight mapping dictionary for tasks.
+- **Reason for change:** Originally, the `Scheduler` existed as a disconnected utility class. By linking the scheduler directly to a pet profile, it can pull the owner's available care time constraint for that day. 
 
 ---
 
