@@ -1,18 +1,40 @@
 from dataclasses import dataclass, field
+from datetime import date, timedelta
 from typing import List, Dict
 
 @dataclass
 class Task:
     description: str
     time: int  # Duration in minutes
-    frequency: str  # e.g., "Daily", "Weekly"
-    start_time: str = "08:00"  # Format: "HH:MM" (e.g., "09:30", "14:00")
+    frequency: str  # "Daily", "Weekly", or "One-time"
+    start_time: str = "08:00"  # Format: "HH:MM"
     is_completed: bool = False
     priority: str = "Medium"  # "High", "Medium", "Low"
+    due_date: date = field(default_factory=date.today)
 
-    def mark_complete(self) -> None:
-        """Changes the task completion status to True."""
+    def mark_complete(self, pet=None) -> None:
+        """Marks the task complete and creates the next instance if recurring."""
+        if self.is_completed:
+            return  # Already completed
+            
         self.is_completed = True
+        
+        # Automate next recurrence if connected to a pet profile
+        if pet and self.frequency in ["Daily", "Weekly"]:
+            days_to_add = 1 if self.frequency == "Daily" else 7
+            next_due_date = self.due_date + timedelta(days=days_to_add)
+            
+            # Spawn a fresh instance scheduled for the future occurrence date
+            next_task = Task(
+                description=self.description,
+                time=self.time,
+                frequency=self.frequency,
+                start_time=self.start_time,
+                priority=self.priority,
+                due_date=next_due_date,
+                is_completed=False
+            )
+            pet.add_task(next_task)
 
     def to_dict(self) -> Dict:
         """Converts the task attributes into a dictionary for UI rendering."""
@@ -22,7 +44,8 @@ class Task:
             "frequency": self.frequency,
             "start_time": self.start_time,
             "is_completed": self.is_completed,
-            "priority": self.priority
+            "priority": self.priority,
+            "due_date": self.due_date.strftime("%Y-%m-%d")
         }
 
 
@@ -49,12 +72,13 @@ class Owner:
         self.pets.append(pet)
 
     def get_all_tasks_across_pets(self) -> List[Dict]:
-        """Retrieves a flat list of all tasks across all pets with back-references."""
+        """Retrieves a flat list of all tasks across all pets with object references."""
         all_tasks = []
         for pet in self.pets:
             for task in pet.tasks:
                 task_data = task.to_dict()
                 task_data["pet_name"] = pet.name
+                task_data["pet_obj"] = pet        # Reference to pet for automation hooks
                 task_data["task_obj"] = task
                 all_tasks.append(task_data)
         return all_tasks
@@ -66,7 +90,7 @@ class Scheduler:
         self.reasoning_log: List[str] = []
 
     def sort_by_time(self, tasks: List[Dict]) -> List[Dict]:
-        """Sorts a list of task dictionaries chronologically by their HH:MM start time string."""
+        """Sorts a list of task dictionaries chronologically by start time string."""
         return sorted(tasks, key=lambda t: t["start_time"])
 
     def filter_tasks(self, tasks: List[Dict], exclude_completed: bool = False, pet_name: str = None) -> List[Dict]:
@@ -79,26 +103,27 @@ class Scheduler:
         return filtered
 
     def generate_daily_plan(self, owner: Owner, available_time_budget: int) -> List[Dict]:
-        """Retrieves, sorts chronologically, filters out completed tasks, and fits into budget."""
+        """Generates an ordered dynamic plan filtering out already completed tasks."""
         self.allocated_time = 0
         self.reasoning_log = []
         
-        # 1. Fetch raw list
         raw_tasks = owner.get_all_tasks_across_pets()
         
-        # 2. Filter out already completed tasks so they don't block fresh time budgets
-        active_tasks = self.filter_tasks(raw_tasks, exclude_completed=True)
+        # Only process tasks due today or earlier that aren't finished yet
+        today_str = date.today().strftime("%Y-%m-%d")
+        active_tasks = [t for t in raw_tasks if not t["is_completed"] and t["due_date"] <= today_str]
         
-        # 3. Sort Chronologically by string time using our updated method
         sorted_tasks = self.sort_by_time(active_tasks)
-        
         scheduled_plan = []
         remaining_time = available_time_budget
         
-        # 4. Fit into time constraint
         for item in sorted_tasks:
             task_obj = item["task_obj"]
+            pet_obj = item["pet_obj"]
             if item["time"] <= remaining_time:
+                # Wire task completion to trigger the next recurrence automatically
+                task_obj.mark_complete(pet=pet_obj)
+                
                 remaining_time -= item["time"]
                 self.allocated_time += item["time"]
                 scheduled_plan.append({
@@ -106,14 +131,15 @@ class Scheduler:
                     "description": item["description"],
                     "time": item["time"],
                     "start_time": item["start_time"],
-                    "priority": item["priority"]
+                    "priority": item["priority"],
+                    "due_date": item["due_date"]
                 })
                 self.reasoning_log.append(
-                    f"Scheduled '{item['description']}' at {item['start_time']} ({item['time']} min)"
+                    f"Scheduled & Automated recurrence for '{item['description']}' at {item['start_time']}."
                 )
             else:
                 self.reasoning_log.append(
-                    f"Skipped '{item['description']}' at {item['start_time']} — Exceeds remaining budget."
+                    f"Skipped '{item['description']}' — Exceeds remaining budget."
                 )
                 
         return scheduled_plan
