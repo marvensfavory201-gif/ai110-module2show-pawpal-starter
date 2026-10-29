@@ -123,11 +123,46 @@ The suite aggressively isolates individual behavior methods, confirming that dat
 ## 📸 Demo Walkthrough
 
 Describe your app in numbered steps so a reader can follow along without watching a video:
+PawPal+ functions as an intelligent daily care assistant. Below is a detailed text walkthrough of the application's user interface features, algorithmic workflows, and scheduling behaviors.
 
-1. <!-- Describe this step -->
-2. <!-- Describe this step -->
-3. <!-- Describe this step -->
-4. <!-- Describe this step -->
-5. <!-- Add more steps as needed -->
+### Main UI Features and User Actions
+- **Profile Management Sidebar/Form:** Allows pet owners to create persistent, unique profiles for multiple pets by specifying their name, breed, and age.
+- **Dynamic Care Task Creator:** Captures required care operations including custom task description, duration in minutes, preferred start time block (HH:MM style), frequency pattern (One-time, Daily, Weekly), and priority urgency tier.
+- **Active Profile Rosters:** Displays a breakdown of how many active care operations are currently configured per registered pet profile.
+-* **Daily Scheduler Control Column:** Features an interactive slider to throttle total available time constraints alongside a primary trigger button to run the scheduling engine logic.
+
+---
+
+
+
+---
+
+
+
+---
+
+### 🖥️ Fenced CLI Sample Output (`main.py`)
+Running the terminal script demonstrates how the core algorithmic layers operate seamlessly outside of the graphical interface:
+
+```text
+============================================================
+🚀 GENERATING DAILY PLAN WITH EXPECTED OVERLAP CONFLICTS
+============================================================
+🐾 [08:00] Biscuit: Morning Insulin Dose
+🐾 [08:00] Cleo: Morning Feeding Meal
+🐾 [15:30] Biscuit: Afternoon Walk
+
+============================================================
+🧠 REVIEWING SCHEDULER LOG OUTPUT & OVERLAP SAFETY WARNINGS
+============================================================
+Daily Schedule Reasoning:
+- Scheduled 'Morning Insulin Dose' at 08:00.
+- Scheduled 'Morning Feeding Meal' at 08:00.
+- Scheduled 'Afternoon Walk' at 15:30.
+
+⚠️ SYSTEM INTEGRITY WARNINGS:
+- ⚠️ TIME OVERLAP DETECTED AT 08:00: Biscuit's Morning Insulin Dose and Cleo's Morning Feeding Meal are scheduled simultaneously!
+============================================================
+```
 
 **Screenshot or video** *(optional)*: <!-- Insert a screenshot or link to a demo video here -->
