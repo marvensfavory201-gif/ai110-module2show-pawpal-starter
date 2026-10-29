@@ -44,7 +44,30 @@ pip install -r requirements.txt
 
 ## 🖥️ Sample Output
 
-Paste a sample of your app's CLI or Streamlit output here so a reader can see what a generated plan looks like:
+```text
+============================================================
+📅 TODAY'S GENERATED CARE SCHEDULE (Budget: 75 mins)
+============================================================
+🐾 [Biscuit] Morning Insulin Medication
+   ⏱️  Duration: 10 mins | ⭐ Priority: High
+------------------------------------------------------------
+🐾 [Cleo] Morning Feeding
+   ⏱️  Duration: 15 mins | ⭐ Priority: High
+------------------------------------------------------------
+🐾 [Biscuit] Long Park Walk
+   ⏱️  Duration: 45 mins | ⭐ Priority: Medium
+------------------------------------------------------------
+
+============================================================
+🧠 SCHEDULER LOGS & DECISION REASONING
+============================================================
+Daily Schedule Reasoning:
+- Scheduled 'Morning Insulin Medication' for Biscuit (10 min) [Priority: High]
+- Scheduled 'Morning Feeding' for Cleo (15 min) [Priority: High]
+- Scheduled 'Long Park Walk' for Biscuit (45 min) [Priority: Medium]
+- Skipped 'Full Grooming & Brushing' for Cleo (30 min) — Exceeds remaining budget of 5 min.
+============================================================
+```
 
 ```
 # e.g.:
