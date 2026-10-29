@@ -53,12 +53,22 @@ I did not accept that setup. I instead verified the classes and built a custom m
 **a. What you tested**
 
 - What behaviors did you test?
+
+Verified that calling the `mark_complete()` method on a task correctly flips its boolean status to True.
+
 - Why were these tests important?
+
+These tests guarantee that our baseline data changes are working correctly before passing them to the visual interface widgets.
 
 **b. Confidence**
 
 - How confident are you that your scheduler works correctly?
+
+Extremely confident in the core algorithm because task sorting by weight works reliably during terminal runs.
+
 - What edge cases would you test next if you had more time?
+
+If I had more time, I would write tests to verify how the algorithm handles an empty pet profile list, or when a task's duration is exactly equal to the remaining minute budget.
 
 ---
 
@@ -67,11 +77,14 @@ I did not accept that setup. I instead verified the classes and built a custom m
 **a. What went well**
 
 - What part of this project are you most satisfied with?
+I am very satisfied with how cleanly the backend algorithm works together with the Streamlit split-screen design. 
 
 **b. What you would improve**
 
 - If you had another iteration, what would you improve or redesign?
+In a second iteration, I would add a feature to let users delete or check off tasks manually from the UI view instead of regenerating the entire list every time.
 
 **c. Key takeaway**
 
 - What is one important thing you learned about designing systems or working with AI on this project?
+ I learned how important it is to keep data logic separated from UI rendering code. It makes debugging errors much easier to isolate.

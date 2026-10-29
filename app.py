@@ -7,12 +7,15 @@ st.set_page_config(page_title="PawPal+ Care Planner", page_icon="🐾", layout="
 st.title("🐾 PawPal+ Care Task Planner")
 st.subheader("Plan smart, personalized daily schedules across all your pets.")
 
-# Initialize global state variables for our system objects
+# Check if an 'owner' already exists in the session state dictionary
 if "owner" not in st.session_state:
-    st.session_state.owner = Owner(name="Pet Parent", email="parent@example.com")
+    # If it's missing, create it once and store it safely in the vault
+    st.session_state.owner = Owner(name="Pet Parent", email="parent@parent.com")
+
 if "scheduler" not in st.session_state:
     st.session_state.scheduler = Scheduler()
 
+# Pull the objects out of the vault so the rest of the app can use them
 owner = st.session_state.owner
 scheduler = st.session_state.scheduler
 
